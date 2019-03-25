@@ -72,10 +72,10 @@ func (cli *Client) GetToken(code string) (string, error) {
 	body := bytes.NewBufferString(params.Encode())
 
 	tokenURL := tokenURL(cli.cfg.TenantID)
-	log.Println("Posting to token url", tokenURL, params.Encode())
+
 	resp, err := cli.net.Post(tokenURL, "application/x-www-form-urlencoded", body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("Error posting to token url %s: %s ", tokenURL, err)
 	}
 	log.Println("Got token", resp.Body)
 	decoder := json.NewDecoder(resp.Body)

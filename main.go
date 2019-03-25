@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/zaker/oauth2local/oauth2"
 
@@ -36,7 +35,7 @@ func main() {
 	}
 
 	if len(*redirectCallback) > 0 {
-		log.Println("Handle redirect", *redirectCallback)
+		// log.Println("Handle redirect", *redirectCallback)
 		code, err := cli.CodeFromCallback(*redirectCallback)
 		if err != nil {
 			log.Println("Couldn't retreive code from url", err)
@@ -52,7 +51,6 @@ func main() {
 			return
 		}
 		fmt.Println("Access Token", accessToken)
-		time.Sleep(time.Second * 10)
 		fmt.Print("Press 'Enter' to continue...")
 		bufio.NewReader(os.Stdin).ReadBytes('\n')
 
