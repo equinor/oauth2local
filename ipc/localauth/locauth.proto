@@ -1,0 +1,15 @@
+syntax = "proto3";
+package localauth;
+
+service LocalAuth {
+  rpc Ping(Empty) returns (PingResponse){};
+  rpc GetAccessToken(Empty) returns (ATResponse){};
+  rpc UpdateCode(UCRequest) returns (Empty){};
+}
+
+message Empty {}
+
+message ATResponse { string accessToken = 1; }
+
+message UCRequest { string code = 1; }
+message PingResponse { string message = 1; }

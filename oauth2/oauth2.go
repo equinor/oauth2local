@@ -40,13 +40,13 @@ func (cli *Client) OpenLoginProvider() error {
 	return nil
 }
 
-func (cli *Client) CodeFromURL(callbackURL string) (string, error) {
+func CodeFromURL(callbackURL, scheme string) (string, error) {
 	u, err := url.Parse(callbackURL)
 	if err != nil {
 		return "", err
 	}
 
-	if u.Scheme != cli.cfg.HandleScheme {
+	if u.Scheme != scheme {
 		return "", fmt.Errorf("App doesn't handle scheme: %s", u.Scheme)
 
 	}
