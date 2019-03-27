@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/pkg/browser"
 
@@ -42,16 +40,15 @@ func (cli *Client) OpenLoginProvider() error {
 	return nil
 }
 
-func (cli *Client) CodeFromCallback(callbackURL string) (string, error) {
+func (cli *Client) CodeFromURL(callbackURL string) (string, error) {
 	u, err := url.Parse(callbackURL)
 	if err != nil {
 		return "", err
 	}
 
 	if u.Scheme != cli.cfg.HandleScheme {
-		log.Println("We dont handle", u.Scheme)
-		time.Sleep(time.Second * 3)
-		return "", err
+		return "", fmt.Errorf("App doesn't handle scheme: %s", u.Scheme)
+
 	}
 	params := u.Query()
 	code := params.Get("code")
@@ -77,7 +74,7 @@ func (cli *Client) GetToken(code string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("Error posting to token url %s: %s ", tokenURL, err)
 	}
-	log.Println("Got token", resp.Body)
+
 	decoder := json.NewDecoder(resp.Body)
 	var dat map[string]interface{}
 	err = decoder.Decode(&dat)

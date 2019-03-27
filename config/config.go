@@ -14,6 +14,7 @@ type Config struct {
 	TenantID     string
 	AppRedirect  string
 	HandleScheme string
+	IsServer     bool
 }
 
 const handleURLScheme = "loc-auth"
@@ -28,7 +29,7 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	c := &Config{HandleScheme: handleURLScheme, AppRedirect: redirectURL()}
+	c := &Config{HandleScheme: handleURLScheme, AppRedirect: redirectURL(), IsServer: true}
 	tenant := os.Getenv("AAD_TENANT_ID")
 	if len(tenant) == 0 {
 		return nil, fmt.Errorf("No tenant id => AAD_TENANT_ID")
