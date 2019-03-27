@@ -1,15 +1,14 @@
 package ipc
+
 import (
 	"context"
 	"net"
-
-	winio "github.com/Microsoft/go-winio"
 )
 
-const pipeName = `\\.\pipe\oauth2local`
+const pipeName = `~/oauth2local.socket`
 
 func listener() (net.Listener, error) {
-	l, err := winio.ListenPipe(pipeName, nil)
+	l, err := net.Listen("unix", pipeName)
 	if err != nil {
 		return nil, err
 	}
@@ -17,6 +16,6 @@ func listener() (net.Listener, error) {
 }
 
 func localPipeDial(ctx context.Context, addr string) (c net.Conn, err error) {
-	c, err = winio.DialPipe(pipeName, nil)
+	c, err = net.Dial("unix", pipeName)
 	return
 }
