@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/exec"
+
+    homedir "github.com/mitchellh/go-homedir"
 )
 
 const desktopHandlerTemplate = `[Desktop Entry]
@@ -30,8 +32,13 @@ func RegMe(urlScheme, locauthPath string) error {
 		return nil
 	}
 
-	filePath := "~/.local/share/applications/Auth2Local.desktop"
-	err := ioutil.WriteFile(filePath, []byte(fileBody), 0644)
+    home, err := homedir.Dir()
+    if err != nil {
+        return err
+    }
+
+	filePath := home +"/.local/share/applications/Auth2Local.desktop"
+	err = ioutil.WriteFile(filePath, []byte(fileBody), 0644)
 	if err != nil {
 		return err
 	}

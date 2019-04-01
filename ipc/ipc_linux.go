@@ -3,12 +3,19 @@ package ipc
 import (
 	"context"
 	"net"
+    homedir "github.com/mitchellh/go-homedir"
 )
 
-const pipeName = `~/oauth2local.socket`
+const pipeName = `/oauth2local.socket`
 
 func listener() (net.Listener, error) {
-	l, err := net.Listen("unix", pipeName)
+    home, err := homedir.Dir()
+    if err != nil {
+        return nil, err
+
+    }
+
+	l, err := net.Listen("unix", home+pipeName)
 	if err != nil {
 		return nil, err
 	}
@@ -16,6 +23,11 @@ func listener() (net.Listener, error) {
 }
 
 func localPipeDial(ctx context.Context, addr string) (c net.Conn, err error) {
-	c, err = net.Dial("unix", pipeName)
+    home, err := homedir.Dir()
+    if err != nil {
+        return
+
+    }
+	c, err = net.Dial("unix", home+pipeName)
 	return
 }
