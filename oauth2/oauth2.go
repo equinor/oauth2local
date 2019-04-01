@@ -98,9 +98,9 @@ func (cli *Client) GetToken(code string) (string, error) {
 	if accessToken, ok := dat["access_token"]; ok {
 		return accessToken.(string), nil
 	}
-	if clientError, ok := dat["access_token"]; ok {
+	if clientError, ok := dat["error"]; ok {
 		return "", fmt.Errorf("Did not receive token: %v", clientError)
 	}
 
-	return "", nil
+	return "", fmt.Errorf("Token response not valid: %v", dat)
 }

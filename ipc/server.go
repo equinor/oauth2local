@@ -22,7 +22,7 @@ func NewServer(cli oauth2.Client, store storage.Storage) (s *Server) {
 
 func (s *Server) GetAccessToken(ctx context.Context, _ *pb.Empty) (*pb.ATResponse, error) {
 
-	c, err := s.store.GetCode()
+	c, err := s.store.GetToken(storage.AuthorizationCode)
 	if err != nil {
 		log.Println("Error:", err)
 		return nil, err
@@ -41,7 +41,7 @@ func (s *Server) Callback(ctx context.Context, cb *pb.CBRequest) (*pb.Empty, err
 	if err != nil {
 		return nil, err
 	}
-	s.store.SetCode(c)
+	s.store.SetToken(storage.AuthorizationCode, c)
 	return &pb.Empty{}, nil
 
 }
