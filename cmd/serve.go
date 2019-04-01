@@ -26,7 +26,7 @@ func runServe(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	cli, err := oauth2.NewClient()
+	cli, err := oauth2.NewAdalHandler(storage.Memory())
 	if err != nil {
 		log.Printf("Error with oauth client: %v", err)
 		return
@@ -34,7 +34,7 @@ func runServe(cmd *cobra.Command, args []string) {
 
 	fmt.Println("starting browser...")
 	cli.OpenLoginProvider()
-	s := ipc.NewServer(*cli, storage.Memory())
+	s := ipc.NewServer(*cli)
 
 	log.Fatalf("Cannot serve: %v", s.Serve())
 }

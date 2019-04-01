@@ -4,30 +4,24 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
 
 	pb "github.com/equinor/oauth2local/ipc/localauth"
 	"github.com/equinor/oauth2local/oauth2"
-	"github.com/equinor/oauth2local/storage"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
-	oauthCli oauth2.Client
-	store    storage.Storage
+	oauthHandler oauth2.Handler
 }
 
-func NewServer(cli oauth2.Client, store storage.Storage) (s *Server) {
-	return &Server{oauthCli: cli, store: store}
+func NewServer(oauthHandler oauth2.Handler) (s *Server) {
+	return &Server{oauthHandler: oauthHandler}
 }
 
 func (s *Server) GetAccessToken(ctx context.Context, _ *pb.Empty) (*pb.ATResponse, error) {
 
-	c, err := s.store.GetToken(storage.AuthorizationCode)
-	if err != nil {
-		log.Println("Error:", err)
-		return nil, err
-	}
-	a, err := s.oauthCli.GetToken(c)
+	a, err := s.oauthHandler.GetAccessToken()
 	if err != nil {
 		log.Println("Error:", err)
 		return nil, err
@@ -37,11 +31,15 @@ func (s *Server) GetAccessToken(ctx context.Context, _ *pb.Empty) (*pb.ATRespons
 
 func (s *Server) Callback(ctx context.Context, cb *pb.CBRequest) (*pb.Empty, error) {
 
-	c, err := s.oauthCli.CodeFromURL(cb.Url)
+	rUrl, err := url.Parse(cb.Url)
 	if err != nil {
 		return nil, err
 	}
-	s.store.SetToken(storage.AuthorizationCode, c)
+	err = s.oauthHandler.UpdateFromRedirect(rUrl)
+	if err != nil {
+		return nil, err
+	}
+	// s.store.SetToken(storage.AuthorizationCode, c)
 	return &pb.Empty{}, nil
 
 }

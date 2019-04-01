@@ -6,28 +6,31 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/equinor/oauth2local/storage"
 	"github.com/pkg/browser"
-
 	"github.com/spf13/viper"
 )
 
-type Client struct {
+type AdalHandler struct {
 	net          *http.Client
 	tenantID     string
 	appRedirect  string
 	clientID     string
 	clientSecret string
 	handleScheme string
+	store        storage.Storage
 }
 
-func NewClient() (*Client, error) {
+func NewAdalHandler(store storage.Storage) (*AdalHandler, error) {
 
-	cli := &Client{net: new(http.Client),
+	cli := &AdalHandler{
+		net:          new(http.Client),
 		tenantID:     viper.GetString("TenantID"),
-		appRedirect:  "loc-auth://callback",
+		appRedirect:  viper.GetString("CustomScheme") + "://callback",
 		clientID:     viper.GetString("ClientID"),
 		clientSecret: viper.GetString("ClientSecret"),
-		handleScheme: viper.GetString("CustomScheme")}
+		handleScheme: viper.GetString("CustomScheme"),
+		store:        store}
 
 	return cli, nil
 }
@@ -37,7 +40,7 @@ func tokenURL(tenant string) string {
 	return fmt.Sprintf("https://login.microsoftonline.com/%s/oauth2/token", tenant)
 }
 
-func (cli *Client) OpenLoginProvider() error {
+func (cli *AdalHandler) OpenLoginProvider() error {
 	params := url.Values{}
 
 	params.Set("redirect_uri", cli.appRedirect)
@@ -65,14 +68,13 @@ func CodeFromURL(callbackURL, scheme string) (string, error) {
 	return code, nil
 }
 
-func (cli *Client) CodeFromURL(callbackURL string) (string, error) {
+func (cli *AdalHandler) CodeFromURL(callbackURL string) (string, error) {
 	return CodeFromURL(callbackURL, cli.handleScheme)
 }
 
-func (cli *Client) GetToken(code string) (string, error) {
+func (cli *AdalHandler) GetToken(code string) (string, error) {
 
 	params := url.Values{}
-
 	params.Set("redirect_uri", cli.appRedirect)
 	params.Set("client_id", cli.clientID)
 	params.Set("client_secret", cli.clientSecret)
@@ -82,7 +84,6 @@ func (cli *Client) GetToken(code string) (string, error) {
 	body := bytes.NewBufferString(params.Encode())
 
 	tokenURL := tokenURL(cli.tenantID)
-
 	resp, err := cli.net.Post(tokenURL, "application/x-www-form-urlencoded", body)
 	if err != nil {
 		return "", fmt.Errorf("Error posting to token url %s: %s ", tokenURL, err)
@@ -103,4 +104,30 @@ func (cli *Client) GetToken(code string) (string, error) {
 	}
 
 	return "", fmt.Errorf("Token response not valid: %v", dat)
+}
+
+func (h AdalHandler) GetAccessToken() (string, error) {
+
+	//Check storage
+	a, err := h.store.GetToken(storage.AccessToken)
+	if err != nil {
+		return "", err
+	}
+	//Reissue to authorize if old
+
+	return a, nil
+}
+func (h AdalHandler) UpdateFromRedirect(redirect *url.URL) error {
+
+	// Decode to authorize code
+
+	// Validate state/nonce
+
+	//
+	return nil
+}
+
+func (h AdalHandler) UpdateFromCode(code string) error {
+
+	return nil
 }
