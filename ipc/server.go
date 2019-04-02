@@ -53,6 +53,8 @@ func (s *Server) Serve() error {
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
+	defer lis.Close()
+
 	gs := grpc.NewServer()
 	pb.RegisterLocalAuthServer(gs, s)
 
