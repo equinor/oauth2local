@@ -7,3 +7,8 @@ type Handler interface {
 	UpdateFromRedirect(*url.URL) error
 	UpdateFromCode(string) error
 }
+type Tokens struct {
+	AccessToken  string
+	IDToken      string
+	RefreshToken string
+}

@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/Microsoft/go-winio v0.4.12
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang/protobuf v1.3.1
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/joho/godotenv v1.3.0
