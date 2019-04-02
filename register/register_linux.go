@@ -8,16 +8,16 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 )
 
-const desktopHandlerTemplate = `#!/usr/bin/env xdg-open
-[Desktop Entry]
+const desktopHandlerTemplate = `[Desktop Entry]
 Type=Application
 Terminal=true
 Name=Local Auth Scheme Handler
-Exec=%s callback "%s"
+Exec=%s callback %s
 StartupNotify=false
-MimeType=x-scheme-handler/%s;`
+MimeType=x-scheme-handler/%s;
+NoDisplay=true`
 
-const xdgRegisterCommand = "xdg-mime default Auth2Local.desktop x-scheme-handler/%s"
+const xdgRegisterCommand = "xdg-mime default auth2local.desktop x-scheme-handler/%s"
 
 func regExist(newContent string) bool {
 	content, err := ioutil.ReadFile("testdata/hello")
@@ -39,7 +39,7 @@ func RegMe(urlScheme, locauthPath string) error {
 		return err
 	}
 
-	filePath := home + "/.local/share/applications/Auth2Local.desktop"
+	filePath := home + "/.local/share/applications/auth2local.desktop"
 	err = ioutil.WriteFile(filePath, []byte(fileBody), 0744)
 	if err != nil {
 		return err

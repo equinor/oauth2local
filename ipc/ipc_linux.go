@@ -2,8 +2,10 @@ package ipc
 
 import (
 	"context"
-	homedir "github.com/mitchellh/go-homedir"
 	"net"
+	"syscall"
+
+	homedir "github.com/mitchellh/go-homedir"
 )
 
 const pipeName = `/oauth2local.socket`
@@ -14,8 +16,9 @@ func listener() (net.Listener, error) {
 		return nil, err
 
 	}
-
-	l, err := net.Listen("unix", home+pipeName)
+	sock := home + pipeName
+	syscall.Unlink(sock)
+	l, err := net.Listen("unix", sock)
 	if err != nil {
 		return nil, err
 	}

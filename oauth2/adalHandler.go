@@ -32,9 +32,9 @@ const (
 	refreshGrant = "refresh_token"
 )
 
-func NewAdalHandler(store storage.Storage) (*AdalHandler, error) {
+func NewAdalHandler(store storage.Storage) (AdalHandler, error) {
 
-	h := &AdalHandler{
+	h := AdalHandler{
 		net:          new(http.Client),
 		tenantID:     viper.GetString("TenantID"),
 		appRedirect:  viper.GetString("CustomScheme") + "://callback",
@@ -93,14 +93,14 @@ func tokenURL(tenant string) string {
 	return fmt.Sprintf("https://login.microsoftonline.com/%s/oauth2/token", tenant)
 }
 
-func (cli *AdalHandler) OpenLoginProvider() error {
+func (h AdalHandler) OpenLoginProvider() error {
 	params := url.Values{}
 
-	params.Set("redirect_uri", cli.appRedirect)
-	params.Set("client_id", cli.clientID)
+	params.Set("redirect_uri", h.appRedirect)
+	params.Set("client_id", h.clientID)
 	params.Set("response_type", "code")
 	params.Set("state", "none")
-	loginURL := fmt.Sprintf("https://login.microsoftonline.com/%s/oauth2/authorize?%s", cli.tenantID, params.Encode())
+	loginURL := fmt.Sprintf("https://login.microsoftonline.com/%s/oauth2/authorize?%s", h.tenantID, params.Encode())
 	browser.OpenURL(loginURL)
 	return nil
 }
@@ -121,8 +121,8 @@ func CodeFromURL(callbackURL, scheme string) (string, error) {
 	return code, nil
 }
 
-func (cli *AdalHandler) CodeFromURL(callbackURL string) (string, error) {
-	return CodeFromURL(callbackURL, cli.handleScheme)
+func (h AdalHandler) CodeFromURL(callbackURL string) (string, error) {
+	return CodeFromURL(callbackURL, h.handleScheme)
 }
 
 func (h AdalHandler) updateTokens(code, grant string) error {
@@ -180,7 +180,7 @@ func (h AdalHandler) updateTokens(code, grant string) error {
 	return nil
 }
 
-func (h *AdalHandler) getValidAccessToken() (string, error) {
+func (h AdalHandler) getValidAccessToken() (string, error) {
 	a, err := h.store.GetToken(storage.AccessToken)
 	if err != nil {
 		return "", err

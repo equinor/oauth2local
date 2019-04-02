@@ -20,15 +20,19 @@ func Memory() *MemoryStorage {
 func (m *MemoryStorage) GetToken(tt TokenType) (string, error) {
 	m.rw.RLock()
 	defer m.rw.RUnlock()
+	t := ""
 	switch tt {
 	case AccessToken:
-		return m.accessToken, nil
+		t = m.accessToken
 	case IDToken:
-		return m.idToken, nil
+		t = m.idToken
 	case RefreshToken:
-		return m.refreshToken, nil
+		t = m.refreshToken
 	}
-	return "", fmt.Errorf("No %v in store", tt)
+	if t == "" {
+		return "", fmt.Errorf("No %v in store", tt)
+	}
+	return t, nil
 }
 
 func (m *MemoryStorage) SetToken(tt TokenType, token string) error {
