@@ -2,7 +2,6 @@ package ipc
 
 import (
 	"context"
-	homedir "github.com/mitchellh/go-homedir"
 	"net"
 	"syscall"
 
@@ -15,8 +14,6 @@ func listener() (net.Listener, error) {
 	home, err := homedir.Dir()
 	if err != nil {
 		return nil, err
-
-	}
 
 	}
 	sock := home + pipeName
