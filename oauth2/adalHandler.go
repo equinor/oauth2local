@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/equinor/oauth2local/storage"
@@ -22,6 +24,7 @@ type AdalHandler struct {
 	handleScheme string
 	store        storage.Storage
 	jwtParser    *jwt.Parser
+	ticker       *time.Ticker
 }
 
 const (
@@ -31,7 +34,7 @@ const (
 
 func NewAdalHandler(store storage.Storage) (*AdalHandler, error) {
 
-	cli := &AdalHandler{
+	h := &AdalHandler{
 		net:          new(http.Client),
 		tenantID:     viper.GetString("TenantID"),
 		appRedirect:  viper.GetString("CustomScheme") + "://callback",
@@ -39,9 +42,50 @@ func NewAdalHandler(store storage.Storage) (*AdalHandler, error) {
 		clientSecret: viper.GetString("ClientSecret"),
 		handleScheme: viper.GetString("CustomScheme"),
 		store:        store,
-		jwtParser:    new(jwt.Parser)}
+		jwtParser:    new(jwt.Parser),
+		ticker:       time.NewTicker(5 * time.Second)}
 
-	return cli, nil
+	go func() {
+		for range h.ticker.C {
+			err := h.renewTokens()
+			if err != nil {
+				log.Println("Couldn't renew token", err)
+			}
+		}
+	}()
+	return h, nil
+}
+
+func (h AdalHandler) renewTokens() error {
+
+	a, err := h.store.GetToken(storage.AccessToken)
+	if err != nil {
+		return err
+	}
+
+	token, _, err := h.jwtParser.ParseUnverified(a, &jwt.StandardClaims{})
+	//Reissue to authorize if old
+	if claims, ok := token.Claims.(*jwt.StandardClaims); ok {
+
+		tokenPeriod := claims.ExpiresAt - claims.IssuedAt
+		currentPeriod := claims.ExpiresAt - time.Now().Unix()
+
+		if currentPeriod > tokenPeriod/5 {
+			log.Println("Token still in grace period")
+			return nil
+		}
+
+	}
+
+	r, err := h.store.GetToken(storage.RefreshToken)
+	if err != nil {
+		return err
+	}
+	err = h.updateTokens(r, refreshGrant)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func tokenURL(tenant string) string {
@@ -153,27 +197,7 @@ func (h *AdalHandler) getValidAccessToken() (string, error) {
 
 func (h AdalHandler) GetAccessToken() (string, error) {
 
-	//Check storage
 	a, err := h.store.GetToken(storage.AccessToken)
-	if err != nil {
-		return "", err
-	}
-
-	token, _, err := h.jwtParser.ParseUnverified(a, &jwt.StandardClaims{})
-	//Reissue to authorize if old
-	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return a, nil
-	}
-	r, err := h.store.GetToken(storage.RefreshToken)
-	if err != nil {
-		return "", err
-	}
-	err = h.updateTokens(r, refreshGrant)
-	if err != nil {
-		return "", err
-	}
-
-	a, err = h.store.GetToken(storage.AccessToken)
 	if err != nil {
 		return "", err
 	}
