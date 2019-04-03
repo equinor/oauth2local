@@ -44,7 +44,7 @@ func RegMe(urlScheme, locauthPath string) error {
 	if err != nil {
 		return err
 	}
-	cmd := exec.Command("xdg-mime", "default", "Auth2Local.desktop", "x-scheme-handler/"+urlScheme)
+	cmd := exec.Command("xdg-mime", "default", "auth2local.desktop", "x-scheme-handler/"+urlScheme)
 
 	err = cmd.Run()
 	if err != nil {
