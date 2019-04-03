@@ -43,7 +43,7 @@ func NewAdalHandler(store storage.Storage) (*AdalHandler, error) {
 		handleScheme: viper.GetString("CustomScheme"),
 		store:        store,
 		jwtParser:    new(jwt.Parser),
-		ticker:       time.NewTicker(5 * time.Second)}
+		ticker:       time.NewTicker(1 * time.Minute)}
 
 	go func() {
 		for range h.ticker.C {
