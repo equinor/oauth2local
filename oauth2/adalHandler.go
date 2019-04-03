@@ -43,11 +43,7 @@ func NewAdalHandler(store storage.Storage) (*AdalHandler, error) {
 		handleScheme: viper.GetString("CustomScheme"),
 		store:        store,
 		jwtParser:    new(jwt.Parser),
-<<<<<<< HEAD
 		ticker:       time.NewTicker(5 * time.Second)}
-=======
-		ticker:       time.NewTicker(1 * time.Minute)}
->>>>>>> Auto renew after 80% of grace period
 
 	go func() {
 		for range h.ticker.C {
