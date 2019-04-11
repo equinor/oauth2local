@@ -35,5 +35,6 @@ steps:
         dep ensure
     fi
     go build -v .
+    go test 
   workingDirectory: '$(modulePath)'
   displayName: 'Get dependencies, then build'
