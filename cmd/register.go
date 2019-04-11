@@ -11,8 +11,8 @@ import (
 // registerCmd represents the register command
 var registerCmd = &cobra.Command{
 	Use:   "register",
-	Short: "Register app ass url handler for custom url",
-	Long:  `Register app ass url handler for custom url`,
+	Short: "Register app as url handler for custom url",
+	Long:  `Register app as url handler for custom url`,
 	Run: func(cmd *cobra.Command, args []string) {
 		register.RegMe(viper.GetString("CustomScheme"), os.Args[0])
 	},

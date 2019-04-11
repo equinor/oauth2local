@@ -11,20 +11,22 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/equinor/oauth2local/storage"
+	"github.com/google/uuid"
 	"github.com/pkg/browser"
 	"github.com/spf13/viper"
 )
 
 type AdalHandler struct {
-	net          *http.Client
-	tenantID     string
-	appRedirect  string
-	clientID     string
-	clientSecret string
-	handleScheme string
-	store        storage.Storage
-	jwtParser    *jwt.Parser
-	ticker       *time.Ticker
+	net           *http.Client
+	tenantID      string
+	appRedirect   string
+	clientID      string
+	clientSecret  string
+	handleScheme  string
+	codeChallenge string
+	store         storage.Storage
+	jwtParser     *jwt.Parser
+	ticker        *time.Ticker
 }
 
 const (
@@ -35,15 +37,16 @@ const (
 func NewAdalHandler(store storage.Storage) (AdalHandler, error) {
 
 	h := AdalHandler{
-		net:          new(http.Client),
-		tenantID:     viper.GetString("TenantID"),
-		appRedirect:  viper.GetString("CustomScheme") + "://callback",
-		clientID:     viper.GetString("ClientID"),
-		clientSecret: viper.GetString("ClientSecret"),
-		handleScheme: viper.GetString("CustomScheme"),
-		store:        store,
-		jwtParser:    new(jwt.Parser),
-		ticker:       time.NewTicker(1 * time.Minute)}
+		net:           new(http.Client),
+		tenantID:      viper.GetString("TenantID"),
+		appRedirect:   viper.GetString("CustomScheme") + "://callback",
+		clientID:      viper.GetString("ClientID"),
+		clientSecret:  viper.GetString("ClientSecret"),
+		handleScheme:  viper.GetString("CustomScheme"),
+		codeChallenge: uuid.New().String() + "-" + uuid.New().String(),
+		store:         store,
+		jwtParser:     new(jwt.Parser),
+		ticker:        time.NewTicker(1 * time.Minute)}
 
 	go func() {
 		for range h.ticker.C {
@@ -100,6 +103,7 @@ func (h AdalHandler) OpenLoginProvider() error {
 	params.Set("client_id", h.clientID)
 	params.Set("response_type", "code")
 	params.Set("state", "none")
+	params.Set("code_challenge", h.codeChallenge)
 	loginURL := fmt.Sprintf("https://login.microsoftonline.com/%s/oauth2/authorize?%s", h.tenantID, params.Encode())
 	browser.OpenURL(loginURL)
 	return nil
@@ -131,7 +135,9 @@ func (h AdalHandler) updateTokens(code, grant string) error {
 	params.Set("client_id", h.clientID)
 	params.Set("client_secret", h.clientSecret)
 	params.Set("grant_type", grant)
+
 	if grant == authGrant {
+		params.Set("code_verifier", h.codeChallenge)
 		params.Set("code", code)
 		params.Set("redirect_uri", h.appRedirect)
 	} else if grant == refreshGrant {
