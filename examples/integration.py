@@ -41,14 +41,17 @@ async def readline_and_kill(args, sf, cf, tf, ef):
     tf.close()
     ef.close()
     tokenCmd.wait()
+    exitcode = 1
     if tokenCmd.returncode == 0:
         print("Success")
+        exitCode= 0
     else:
         with open("token.log", "r") as logFile:
             log = logFile.read()
         print("Error", log)
     server.kill()
-    return await server.wait()  # wait for the child process to exit
+    await server.wait()  # wait for the child process to exit
+    return exitCode
 
 
 if sys.platform == "win32":
