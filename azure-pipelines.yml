@@ -42,3 +42,9 @@ steps:
 - script: go test -v ./...
   workingDirectory: '$(modulePath)'
   displayName: 'Run tests'
+
+- task: DockerCompose@0
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerComposeFile: '**/example/docker-compose.yml'
+    action: 'Run services'
