@@ -10,7 +10,7 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 variables:
-  modulePath: '/src/github.com/$(build.repository.name)' # Path to the module's code
+  modulePath: './src/github.com/$(build.repository.name)' # Path to the module's code
 
 steps:
 - task: GoTool@0
@@ -19,11 +19,9 @@ steps:
   displayName: Installing go
 
 - script: |
-    mkdir -p '$(GOPATH)/pkg'
     mkdir -p '$(modulePath)'
     shopt -s extglob
     shopt -s dotglob
-    mv !(GOPATH) '$(modulePath)'
     echo '##vso[task.prependpath]$(GOBIN)'
     echo '##vso[task.prependpath]$(GOROOT)/bin'
   displayName: 'Set up the Go workspace'
@@ -45,7 +43,7 @@ steps:
 
 - script: go build -o examples/oauth2local
   workingDirectory: '$(modulePath)'
-  displayName: 'Building for integration test tests'
+  displayName: 'Building for integration test'
 
 - task: DockerCompose@0
   displayName: 'Running integration test'
