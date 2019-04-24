@@ -26,13 +26,13 @@ steps:
   displayName: 'Get dependencies, then build'
 
 - script: go test -v ./...
-  displayName: 'Run tests'
+  displayName: 'Run unit tests'
 
 - script: go build -o examples/oauth2local
-  displayName: 'Building for integration test'
+  displayName: 'Building for integration tests'
 
 - task: DockerCompose@0
-  displayName: 'Running integration test'
+  displayName: 'Run integration tests'
   inputs:
     containerregistrytype: 'Container Registry'
     dockerComposeFile: '$(Build.Repository.LocalPath)/examples/docker-compose.yml'
