@@ -16,6 +16,7 @@ var testSettings = Oauth2Settings{
 	TenantID:     "comon",
 	ClientID:     "clientid",
 	ClientSecret: "secret",
+	ResourceID:   "resource",
 }
 
 type TokenResponse struct {

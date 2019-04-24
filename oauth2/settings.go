@@ -7,6 +7,7 @@ type Oauth2Settings struct {
 	AuthServer   string
 	ClientID     string
 	ClientSecret string
+	ResourceID   string
 }
 
 func (o2o Oauth2Settings) Valid() bool {
@@ -21,6 +22,10 @@ func (o2o Oauth2Settings) Valid() bool {
 	}
 
 	if o2o.ClientSecret == "" {
+		return false
+	}
+
+	if o2o.ResourceID == "" {
 		return false
 	}
 	return true

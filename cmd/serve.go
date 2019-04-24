@@ -38,6 +38,7 @@ func runServe(cmd *cobra.Command, args []string) {
 			TenantID:     viper.GetString("TenantID"),
 			ClientID:     viper.GetString("ClientID"),
 			ClientSecret: viper.GetString("ClientSecret"),
+			ResourceID:   viper.GetString("ResourceID"),
 		})}
 	if viper.GetBool("IgnoreStateCheck") {
 		opts = append(opts, oauth2.WithState("none"))
