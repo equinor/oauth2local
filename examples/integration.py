@@ -45,7 +45,7 @@ async def readline_and_kill(args, sf, cf, tf, ef):
     exitCode = 1
     if tokenCmd.returncode == 0:
         print("Success")
-        exitCode= 10
+        exitCode = 0
     else:
         with open("token.log", "r") as logFile:
             log = logFile.read()
