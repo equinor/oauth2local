@@ -42,7 +42,7 @@ async def readline_and_kill(args, sf, cf, tf, ef):
     tf.close()
     ef.close()
     tokenCmd.wait()
-    exitcode = 1
+    exitCode = 1
     if tokenCmd.returncode == 0:
         print("Success")
         exitCode= 0
