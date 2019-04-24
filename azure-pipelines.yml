@@ -10,13 +10,13 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 variables:
-  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
+  modulePath: '/src/github.com/$(build.repository.name)' # Path to the module's code
 
 steps:
 - task: GoTool@0
   inputs:
     version: '1.12'
-  displayName: Installing go version
+  displayName: Installing go
 
 - script: |
     mkdir -p '$(GOPATH)/pkg'
@@ -43,8 +43,13 @@ steps:
   workingDirectory: '$(modulePath)'
   displayName: 'Run tests'
 
+- script: go build -o examples/oauth2local
+  workingDirectory: '$(modulePath)'
+  displayName: 'Building for integration test tests'
+
 - task: DockerCompose@0
+  displayName: 'Running integration test'
   inputs:
     containerregistrytype: 'Container Registry'
-    dockerComposeFile: '$(modulePath)/example/docker-compose.yml'
+    dockerComposeFile: '$(modulePath)/examples/docker-compose.yml'
     action: 'Run services'
