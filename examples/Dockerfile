@@ -4,4 +4,4 @@ COPY . /code
 
 WORKDIR /code
 
-ENTRYPOINT [ "python", "integration.py" ]
+CMD [ "python", "integration.py" ]
