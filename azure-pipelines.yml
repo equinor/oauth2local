@@ -35,5 +35,5 @@ steps:
   displayName: 'Running integration test'
   inputs:
     containerregistrytype: 'Container Registry'
-    dockerComposeFile: '$(Agent.WorkFolder)/examples/docker-compose.yml'
+    dockerComposeFile: '$(Build.Repository.LocalPath)/examples/docker-compose.yml'
     action: 'Run services'
