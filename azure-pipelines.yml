@@ -17,6 +17,7 @@ steps:
   inputs:
     version: '1.12'
   displayName: Installing go version
+
 - script: |
     mkdir -p '$(GOPATH)/pkg'
     mkdir -p '$(modulePath)'
