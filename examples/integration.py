@@ -12,6 +12,7 @@ serverArgs = ["./oauth2local",
               "--config",
               "test-oauth2-config.yml",
               "serve"]
+print(serverArgs)
 callbackArgs = ["./oauth2local",
                 "--verbose",
                 "--config",
