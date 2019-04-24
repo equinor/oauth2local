@@ -10,7 +10,7 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 variables:
-  modulePath: './src/github.com/$(build.repository.name)' # Path to the module's code
+  modulePath: '$(Agent.WorkFolder)/src/github.com/$(build.repository.name)' # Path to the module's code
 
 steps:
 - task: GoTool@0
