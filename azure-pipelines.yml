@@ -46,5 +46,5 @@ steps:
 - task: DockerCompose@0
   inputs:
     containerregistrytype: 'Container Registry'
-    dockerComposeFile: '**/example/docker-compose.yml'
+    dockerComposeFile: '$(modulePath)/example/docker-compose.yml'
     action: 'Run services'
