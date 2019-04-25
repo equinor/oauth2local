@@ -93,6 +93,9 @@ func WithOauth2Settings(o2o Oauth2Settings) Option {
 		h.o2o = o2o
 		h.o2o.AuthServer = strings.TrimRight(h.o2o.AuthServer, "/")
 		h.o2o.AuthServer = strings.TrimSpace(h.o2o.AuthServer)
+		if h.o2o.resourceID == "" {
+			h.o2o.resourceID = h.o2o.clientID
+		}
 		return nil
 	})
 }
@@ -203,7 +206,7 @@ func (h *AdalHandler) updateTokens(code, grant string) error {
 	} else if grant == refreshGrant {
 		params.Set("refresh_token", code)
 	}
-	params.Set("resource", h.o2o.ClientID)
+	params.Set("resource", h.o2o.ResourceID)
 
 	tokenURL := h.tokenURL()
 	jww.DEBUG.Println("Getting token from:", tokenURL)
