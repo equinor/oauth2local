@@ -1,4 +1,5 @@
 package ipc
+
 import (
 	"context"
 	"fmt"
@@ -32,10 +33,12 @@ func (s *Server) Callback(ctx context.Context, cb *pb.CBRequest) (*pb.Empty, err
 	jww.DEBUG.Println("Callback from provider: ", cb.Url)
 	rURL, err := url.Parse(cb.Url)
 	if err != nil {
+		jww.ERROR.Println("Callback error:", err)
 		return nil, err
 	}
 	err = s.oauthHandler.UpdateFromRedirect(rURL)
 	if err != nil {
+		jww.ERROR.Println("Callback error:", err)
 		return nil, err
 	}
 
