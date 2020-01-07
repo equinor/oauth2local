@@ -41,7 +41,7 @@ func (s *Server) Callback(ctx context.Context, cb *pb.CBRequest) (*pb.Empty, err
 		jww.ERROR.Println("Callback error:", err)
 		return nil, err
 	}
-
+	jww.INFO.Println("Auth ok")
 	return &pb.Empty{}, nil
 }
 
