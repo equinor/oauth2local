@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/equinor/oauth2local/ipc"
 	"github.com/spf13/cobra"
@@ -24,7 +25,14 @@ var tokenCmd = &cobra.Command{
 		a, err := cli.GetAccessToken()
 		if err != nil {
 			jww.ERROR.Println(err)
-			os.Exit(1)
+
+			s := err.Error()
+
+			if strings.Contains(s, "code = Unavailable") {
+				os.Exit(8)
+			} else {
+				os.Exit(1)
+			}
 		}
 
 		fmt.Println(a)
