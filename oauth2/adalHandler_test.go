@@ -80,14 +80,20 @@ func TestAdalHandler_UpdateFromRedirect(t *testing.T) {
 	)
 
 	if err != nil {
-		t.Errorf("Failed creating handler %v", err)
+		t.Errorf("Failed creating handler %w", err)
 	}
 
 	redir, err := url.Parse("loc-auth://callback?state=none")
+	if err != nil {
+		t.Errorf("Parsing callback url %w", err)
+	}
 	failScheme, err := url.Parse("loki-auth://callback?state=none")
+	if err != nil {
+		t.Errorf("Parsing callback url %w", err)
+	}
 	noState, err := url.Parse("loki-auth://callback")
 	if err != nil {
-		t.Errorf("Couldn't parse url %v", err)
+		t.Errorf("Couldn't parse url %w", err)
 	}
 	tests := []struct {
 		name    string
@@ -128,7 +134,10 @@ func TestAdalHandler_GetAccessToken(t *testing.T) {
 		}
 	})
 	testStore := storage.Memory()
-	testStore.SetToken(storage.AccessToken, "accessToken")
+	err := testStore.SetToken(storage.AccessToken, "accessToken")
+	if err != nil {
+		t.Errorf("Setting token failed %w", err)
+	}
 	h, err := NewAdal(
 		WithOauth2Settings(testSettings),
 		WithClient(errCli),
@@ -137,7 +146,7 @@ func TestAdalHandler_GetAccessToken(t *testing.T) {
 	)
 
 	if err != nil {
-		t.Errorf("Failed creating handler %v", err)
+		t.Errorf("Failed creating handler %w", err)
 	}
 
 	tests := []struct {

@@ -73,7 +73,10 @@ func NewAdal(opts ...Option) (*AdalHandler, error) {
 	dopts.renewer = dopts.defaultRenewer
 
 	for _, opt := range opts {
-		opt.apply(dopts)
+		err := opt.apply(dopts)
+		if err != nil {
+			return nil, fmt.Errorf("Oauth2 Settings loading %w", err)
+		}
 	}
 
 	if !dopts.o2o.Valid() {
@@ -136,7 +139,9 @@ func (h *AdalHandler) renewTokens() error {
 	}
 
 	token, _, err := h.jwtParser.ParseUnverified(a, &jwt.StandardClaims{})
-
+	if err != nil {
+		return err
+	}
 	if claims, ok := token.Claims.(*jwt.StandardClaims); ok {
 
 		tokenPeriod := claims.ExpiresAt - claims.IssuedAt

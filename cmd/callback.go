@@ -22,12 +22,12 @@ var callbackCmd = &cobra.Command{
 		if err != nil {
 
 			jww.ERROR.Println("Error...", err)
-			bufio.NewReader(os.Stdin).ReadBytes('\n')
+			_, _ = bufio.NewReader(os.Stdin).ReadBytes('\n')
 			return
 		}
 		if breakB {
 			jww.INFO.Println("sent calback", args)
-			bufio.NewReader(os.Stdin).ReadBytes('\n')
+			_, _ = bufio.NewReader(os.Stdin).ReadBytes('\n')
 		}
 	},
 }

@@ -10,9 +10,18 @@ func EmptyMemory() *MemoryStorage {
 
 func PrefilledMemory() *MemoryStorage {
 	m := Memory()
-	m.SetToken(AccessToken, "accesstokenstring")
-	m.SetToken(IDToken, "idtokenstring")
-	m.SetToken(RefreshToken, "refreshtokenstring")
+	err := m.SetToken(AccessToken, "accesstokenstring")
+	if err != nil {
+		panic(err)
+	}
+	err = m.SetToken(IDToken, "idtokenstring")
+	if err != nil {
+		panic(err)
+	}
+	err = m.SetToken(RefreshToken, "refreshtokenstring")
+	if err != nil {
+		panic(err)
+	}
 	return m
 }
 func TestMemoryStorage_GetToken(t *testing.T) {

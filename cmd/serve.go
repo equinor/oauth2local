@@ -58,7 +58,11 @@ func runServe(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	browser.OpenURL(lpu)
+	err = browser.OpenURL(lpu)
+	if err != nil {
+		jww.ERROR.Println(err)
+		os.Exit(1)
+	}
 	s := ipc.NewServer(oauthHandler)
 
 	jww.ERROR.Println("Cannot serve:", s.Serve())

@@ -15,7 +15,7 @@ func (o2o Oauth2Settings) Valid() bool {
 	if o2o.AuthServer == "" {
 		return false
 	}
-	strings.TrimRight(o2o.AuthServer, "/")
+	o2o.AuthServer = strings.TrimRight(o2o.AuthServer, "/")
 
 	if o2o.ClientID == "" {
 		return false
