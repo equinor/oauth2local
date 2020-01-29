@@ -12,6 +12,7 @@ Usage:
 
 Available Commands:
   callback    Send callback url to sovereign
+  defaults    Writes default config values to config file
   help        Help about any command
   register    Register app as url handler for custom url
   serve       serve a local auth provider
