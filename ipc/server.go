@@ -36,7 +36,7 @@ func (s *Server) Callback(ctx context.Context, cb *pb.CBRequest) (*pb.Empty, err
 		jww.ERROR.Println("Callback error:", err)
 		return nil, err
 	}
-	err = s.oauthHandler.UpdateFromRedirect(rURL)
+	err = s.oauthHandler.UpdateFromRedirect(oauth2.DecodeRedirect(rURL))
 	if err != nil {
 		jww.ERROR.Println("Callback error:", err)
 		return nil, err

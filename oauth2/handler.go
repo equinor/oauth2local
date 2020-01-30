@@ -3,7 +3,6 @@ package oauth2
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"reflect"
 	"strings"
 
@@ -13,7 +12,7 @@ import (
 
 type Handler interface {
 	GetAccessToken() (string, error)
-	UpdateFromRedirect(*url.URL) error
+	UpdateFromRedirect(*RedirectParams) error
 	UpdateFromCode(string) error
 	LoginProviderURL() (string, error)
 }

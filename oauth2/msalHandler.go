@@ -215,21 +215,20 @@ func (h *MsalHandler) GetAccessToken() (string, error) {
 
 	return a, nil
 }
-func (h *MsalHandler) UpdateFromRedirect(redirect *url.URL) error {
+func (h *MsalHandler) UpdateFromRedirect(rp *RedirectParams) error {
 
-	rp := DecodeRedirect(redirect)
-	if rp.state != h.sessionState {
+	if rp.State != h.sessionState {
 		return errors.New("Invalid state in redirect")
 	}
 
-	if rp.scheme != h.scheme {
+	if rp.Scheme != h.scheme {
 		return errors.New("Invalid scheme in redirect")
 	}
 
 	h.mut.Lock()
 	defer h.mut.Unlock()
 
-	err := h.updateTokens(rp.code, authGrant)
+	err := h.updateTokens(rp.Code, authGrant)
 	if err != nil {
 		return err
 	}

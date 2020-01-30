@@ -3,18 +3,18 @@ package oauth2
 import "net/url"
 
 type RedirectParams struct {
-	scheme string
-	code   string
-	state  string
+	Scheme string
+	Code   string
+	State  string
 }
 
 func DecodeRedirect(u *url.URL) *RedirectParams {
 
 	params := u.Query()
 	return &RedirectParams{
-		scheme: u.Scheme,
-		code:   params.Get("code"),
-		state:  params.Get("state"),
+		Scheme: u.Scheme,
+		Code:   params.Get("code"),
+		State:  params.Get("state"),
 	}
 
 }
