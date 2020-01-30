@@ -2,18 +2,18 @@ package oauth2
 
 type EmptyOption struct{}
 
-func (EmptyOption) apply(*AdalHandler) (err error) { return }
+func (EmptyOption) apply(*interface{}) (err error) { return }
 
 type funcOption struct {
-	f func(*AdalHandler) error
+	f func(interface{}) error
 }
 
-func (fo *funcOption) apply(h *AdalHandler) error {
+func (fo *funcOption) apply(h interface{}) error {
 
 	return fo.f(h)
 }
 
-func newFuncOption(f func(*AdalHandler) error) *funcOption {
+func newFuncOption(f func(interface{}) error) *funcOption {
 	return &funcOption{
 		f: f,
 	}

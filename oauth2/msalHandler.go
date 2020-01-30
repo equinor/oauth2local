@@ -15,7 +15,7 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 )
 
-type AdalHandler struct {
+type MsalHandler struct {
 	client        *http.Client
 	o2o           Oauth2Settings
 	appRedirect   string
@@ -29,7 +29,7 @@ type AdalHandler struct {
 	renewer       func()
 }
 
-func (h *AdalHandler) defaultRenewer() {
+func (h *MsalHandler) defaultRenewer() {
 	for range h.ticker.C {
 		err := h.renewTokens()
 		if err != nil {
@@ -38,9 +38,9 @@ func (h *AdalHandler) defaultRenewer() {
 	}
 }
 
-func NewAdal(opts ...Option) (*AdalHandler, error) {
+func NewMsal(opts ...Option) (*MsalHandler, error) {
 
-	dopts := &AdalHandler{
+	dopts := &MsalHandler{
 		client:        new(http.Client),
 		o2o:           Oauth2Settings{},
 		appRedirect:   "loc-auth://callback",
@@ -73,7 +73,7 @@ func NewAdal(opts ...Option) (*AdalHandler, error) {
 	return dopts, nil
 }
 
-func (h *AdalHandler) renewTokens() error {
+func (h *MsalHandler) renewTokens() error {
 
 	a, err := h.store.GetToken(storage.AccessToken)
 	if err != nil {
@@ -108,19 +108,19 @@ func (h *AdalHandler) renewTokens() error {
 	return nil
 }
 
-func (h *AdalHandler) tokenURL() string {
+func (h *MsalHandler) tokenURL() string {
 
 	return fmt.Sprintf("%s/oauth2/token", h.getAuthEndpoint())
 }
 
-func (h *AdalHandler) getAuthEndpoint() string {
+func (h *MsalHandler) getAuthEndpoint() string {
 	if h.o2o.TenantID == "" {
 		return h.o2o.AuthServer
 	}
 	return fmt.Sprintf("%s/%s", h.o2o.AuthServer, h.o2o.TenantID)
 }
 
-func (h *AdalHandler) LoginProviderURL() (string, error) {
+func (h *MsalHandler) LoginProviderURL() (string, error) {
 	u, err := url.Parse(fmt.Sprintf("%s/oauth2/authorize", h.getAuthEndpoint()))
 	if err != nil {
 		return "", err
@@ -139,7 +139,7 @@ func (h *AdalHandler) LoginProviderURL() (string, error) {
 
 }
 
-func (h *AdalHandler) updateTokens(code, grant string) error {
+func (h *MsalHandler) updateTokens(code, grant string) error {
 	defer h.client.CloseIdleConnections()
 	params := url.Values{}
 	params.Set("client_id", h.o2o.ClientID)
@@ -206,7 +206,7 @@ func (h *AdalHandler) updateTokens(code, grant string) error {
 	return nil
 }
 
-func (h *AdalHandler) GetAccessToken() (string, error) {
+func (h *MsalHandler) GetAccessToken() (string, error) {
 
 	a, err := h.store.GetToken(storage.AccessToken)
 	if err != nil {
@@ -215,7 +215,7 @@ func (h *AdalHandler) GetAccessToken() (string, error) {
 
 	return a, nil
 }
-func (h *AdalHandler) UpdateFromRedirect(redirect *url.URL) error {
+func (h *MsalHandler) UpdateFromRedirect(redirect *url.URL) error {
 
 	rp := DecodeRedirect(redirect)
 	if rp.state != h.sessionState {
@@ -237,7 +237,7 @@ func (h *AdalHandler) UpdateFromRedirect(redirect *url.URL) error {
 	return nil
 }
 
-func (h *AdalHandler) UpdateFromCode(code string) error {
+func (h *MsalHandler) UpdateFromCode(code string) error {
 	h.mut.Lock()
 	defer h.mut.Unlock()
 	return fmt.Errorf("Not implemented")

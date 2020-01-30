@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/pkg/browser"
@@ -44,7 +45,17 @@ func runServe(cmd *cobra.Command, args []string) {
 	if viper.GetBool("IgnoreStateCheck") {
 		opts = append(opts, oauth2.WithState("none"))
 	}
-	oauthHandler, err := oauth2.NewAdal(opts...)
+	var oauthHandler oauth2.Handler
+	var err error
+	switch config.AuthServerType() {
+	case "adal":
+		oauthHandler, err = oauth2.NewMsal(opts...)
+	case "msal":
+		oauthHandler, err = oauth2.NewAdal(opts...)
+	default:
+		err = fmt.Errorf("No authserver selected")
+	}
+
 	if err != nil {
 		jww.ERROR.Printf("Error with oauth client: %v", err)
 		os.Exit(1)
