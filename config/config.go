@@ -6,12 +6,12 @@ import (
 
 func SetDefaults() {
 	viper.SetDefault("CustomScheme", "loc-auth")
-	viper.SetDefault("Authserver", "adal")
+	viper.SetDefault("Authserver", "https://login.example.com/")
 	viper.SetDefault("AuthType", "adal")
-	viper.SetDefault("TenantID", "tenant id")
-	viper.SetDefault("ClientID", "client id")
-	viper.SetDefault("ClientSecret", "client secret")
-	viper.SetDefault("ResourceID", "resource id")
+	viper.SetDefault("TenantID", "")
+	viper.SetDefault("ClientID", "")
+	viper.SetDefault("ClientSecret", "")
+	viper.SetDefault("ResourceID", "")
 }
 
 func AuthServer() string {

@@ -59,7 +59,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		jww.ERROR.Println(err)
+		jww.INFO.Println(err)
 	}
 
 }
