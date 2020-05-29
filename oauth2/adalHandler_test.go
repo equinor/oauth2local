@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"testing"
 
+	"github.com/equinor/oauth2local/oauth2/redirect"
 	"github.com/equinor/oauth2local/storage"
 )
 
@@ -42,7 +42,7 @@ func NewTestClient(fn RoundTripFunc) *http.Client {
 
 func TestAdalHandler_UpdateFromRedirect(t *testing.T) {
 	type args struct {
-		redirect *url.URL
+		params *redirect.Params
 	}
 
 	testTokenCli := NewTestClient(func(req *http.Request) *http.Response {
@@ -83,31 +83,19 @@ func TestAdalHandler_UpdateFromRedirect(t *testing.T) {
 		t.Errorf("Failed creating handler %w", err)
 	}
 
-	redir, err := url.Parse("loc-auth://callback?state=none")
-	if err != nil {
-		t.Errorf("Parsing callback url %w", err)
-	}
-	failScheme, err := url.Parse("loki-auth://callback?state=none")
-	if err != nil {
-		t.Errorf("Parsing callback url %w", err)
-	}
-	noState, err := url.Parse("loki-auth://callback")
-	if err != nil {
-		t.Errorf("Couldn't parse url %w", err)
-	}
 	tests := []struct {
 		name    string
 		h       Handler
 		args    args
 		wantErr bool
 	}{
-		{name: "Update tokens", h: h, args: args{redir}, wantErr: false},
-		{"Fail update ", h, args{failScheme}, true},
-		{"No state in return", h, args{noState}, true},
+		{name: "Update tokens", h: h, args: args{&redirect.Params{Scheme: "loc-auth", State: "none"}}, wantErr: false},
+		{"Wrong scheme", h, args{&redirect.Params{Scheme: "ddd-auth", State: "none"}}, true},
+		{"No state in return", h, args{&redirect.Params{Scheme: "loc-auth"}}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.h.UpdateFromRedirect(tt.args.redirect); (err != nil) != tt.wantErr {
+			if err := tt.h.UpdateFromRedirect(tt.args.params); (err != nil) != tt.wantErr {
 				t.Errorf("AdalHandler.UpdateFromRedirect() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
