@@ -6,13 +6,15 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/equinor/oauth2local/oauth2/redirect"
+
 	"github.com/equinor/oauth2local/storage"
 	"github.com/google/uuid"
 )
 
 type Handler interface {
 	GetAccessToken() (string, error)
-	UpdateFromRedirect(*RedirectParams) error
+	UpdateFromRedirect(*redirect.Params) error
 	UpdateFromCode(string) error
 	LoginProviderURL() (string, error)
 }
@@ -121,6 +123,30 @@ func WithOauth2Settings(o2o Oauth2Settings) Option {
 			return fmt.Errorf("Not implemented for this type %v", reflect.TypeOf(h))
 		}
 
+		return nil
+	})
+}
+
+func WithLocalhostHttpServer(port uint) Option {
+	redirectURL := fmt.Sprintf("http://localhost:%d/callback", port)
+	return newFuncOption(func(h interface{}) error {
+		var s *redirect.Server
+		switch h := h.(type) {
+		case *AdalHandler:
+			h.redirectURL = redirectURL
+			h.scheme = "http"
+			s = redirect.Init(port, h.UpdateFromRedirect)
+		case *MsalHandler:
+			h.redirectURL = redirectURL
+			h.scheme = "http"
+			s = redirect.Init(port, h.UpdateFromRedirect)
+		default:
+			return fmt.Errorf("Not implemented for this type %v", reflect.TypeOf(h))
+		}
+
+		if s != nil {
+			go s.Serve()
+		}
 		return nil
 	})
 }

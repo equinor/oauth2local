@@ -11,6 +11,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/equinor/oauth2local/oauth2/redirect"
 	"github.com/equinor/oauth2local/storage"
 	jww "github.com/spf13/jwalterweatherman"
 )
@@ -18,7 +19,7 @@ import (
 type MsalHandler struct {
 	client        *http.Client
 	o2o           Oauth2Settings
-	appRedirect   string
+	redirectURL   string
 	scheme        string
 	sessionState  string
 	codeChallenge string
@@ -43,7 +44,7 @@ func NewMsal(opts ...Option) (*MsalHandler, error) {
 	dopts := &MsalHandler{
 		client:        new(http.Client),
 		o2o:           Oauth2Settings{},
-		appRedirect:   "loc-auth://callback",
+		redirectURL:   "loc-auth://callback",
 		scheme:        "loc-auth",
 		sessionState:  generateSessionState(),
 		codeChallenge: generateCodeChallenge(),
@@ -128,7 +129,7 @@ func (h *MsalHandler) LoginProviderURL() (string, error) {
 	jww.DEBUG.Println("LoginProvider at:", u)
 	params := u.Query()
 
-	params.Set("redirect_uri", h.appRedirect)
+	params.Set("redirect_uri", h.redirectURL)
 	params.Set("client_id", h.o2o.ClientID)
 	params.Set("response_type", "code")
 	params.Set("state", h.sessionState)
@@ -149,7 +150,7 @@ func (h *MsalHandler) updateTokens(code, grant string) error {
 	if grant == authGrant {
 		params.Set("code_verifier", h.codeChallenge)
 		params.Set("code", code)
-		params.Set("redirect_uri", h.appRedirect)
+		params.Set("redirect_uri", h.redirectURL)
 	} else if grant == refreshGrant {
 		params.Set("refresh_token", code)
 	}
@@ -215,7 +216,7 @@ func (h *MsalHandler) GetAccessToken() (string, error) {
 
 	return a, nil
 }
-func (h *MsalHandler) UpdateFromRedirect(rp *RedirectParams) error {
+func (h *MsalHandler) UpdateFromRedirect(rp *redirect.Params) error {
 
 	if rp.State != h.sessionState {
 		return errors.New("Invalid state in redirect")

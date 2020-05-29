@@ -42,8 +42,15 @@ func runServe(cmd *cobra.Command, args []string) {
 			ClientSecret: config.ClientSecret(),
 			ResourceID:   config.ResourceID(),
 		})}
-	if viper.GetBool("IgnoreStateCheck") {
+	if config.IgnoreStateCheck() {
 		opts = append(opts, oauth2.WithState("none"))
+	}
+
+	var port = config.LocalHttpServerPort()
+	if port > 0 && port < 65536 {
+		jww.DEBUG.Println("Using local http server to receive callback")
+		opts = append(opts, oauth2.WithLocalhostHttpServer(port))
+
 	}
 	var oauthHandler oauth2.Handler
 	var err error

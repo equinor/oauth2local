@@ -7,6 +7,7 @@ import (
 
 	pb "github.com/equinor/oauth2local/ipc/localauth"
 	"github.com/equinor/oauth2local/oauth2"
+	"github.com/equinor/oauth2local/oauth2/redirect"
 	jww "github.com/spf13/jwalterweatherman"
 	"google.golang.org/grpc"
 )
@@ -36,7 +37,7 @@ func (s *Server) Callback(ctx context.Context, cb *pb.CBRequest) (*pb.Empty, err
 		jww.ERROR.Println("Callback error:", err)
 		return nil, err
 	}
-	err = s.oauthHandler.UpdateFromRedirect(oauth2.DecodeRedirect(rURL))
+	err = s.oauthHandler.UpdateFromRedirect(redirect.DecodeRedirect(rURL))
 	if err != nil {
 		jww.ERROR.Println("Callback error:", err)
 		return nil, err

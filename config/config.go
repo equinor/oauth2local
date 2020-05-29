@@ -55,3 +55,14 @@ func CustomScheme() string {
 	viper.RegisterAlias("CustomScheme", "CUSTOM_SCHEME")
 	return viper.GetString("CUSTOM_SCHEME")
 }
+
+func LocalHttpServerPort() uint {
+	viper.RegisterAlias("LocalHttpServerPort", "LOCAL_HTTP_SERVER_PORT")
+	return viper.GetUint("LOCAL_HTTP_SERVER_PORT")
+}
+
+func IgnoreStateCheck() bool {
+	viper.RegisterAlias("IgnoreStateCheck", "IGNORE_STATE_CHECK")
+	return viper.GetBool("IGNORE_STATE_CHECK")
+
+}
