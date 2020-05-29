@@ -8,6 +8,7 @@ from asyncio.subprocess import PIPE
 from contextlib import closing
 
 serverArgs = ["./oauth2local",
+              "--testing",
               "--verbose",
               "--config",
               "test-oauth2-config.yml",
@@ -27,32 +28,37 @@ tokenArgs = ["./oauth2local",
 
 async def readline_and_kill(args, sf, cf, tf, ef):
     # start child process
-    server = await asyncio.create_subprocess_exec(
-        args[0], *args[1:], stdout=sf, stderr=ef)
-    time.sleep(3)
-    callbackCmd = Popen(callbackArgs,
-                        stdout=cf,
-                        stderr=ef)
-    callbackCmd.wait()
-    cf.close()
-    time.sleep(3)
-    tokenCmd = Popen(callbackArgs,
-                     stdout=tf,
-                     stderr=ef)
-    tf.close()
-    ef.close()
-    tokenCmd.wait()
-    exitCode = 1
-    if tokenCmd.returncode == 0:
-        print("Success")
-        exitCode = 0
-    else:
-        with open("token.log", "r") as logFile:
+    try:
+        server = await asyncio.create_subprocess_exec(
+            args[0], *args[1:], stdout=sf, stderr=ef)
+        time.sleep(3)
+        callbackCmd = Popen(callbackArgs,
+                            stdout=cf,
+                            stderr=ef)
+        callbackCmd.wait()
+        cf.close()
+        time.sleep(3)
+        tokenCmd = Popen(callbackArgs,
+                         stdout=tf,
+                         stderr=ef)
+        tf.close()
+        ef.close()
+        tokenCmd.wait()
+        exitCode = 1
+        if tokenCmd.returncode == 0:
+            print("Success")
+            exitCode = 0
+        else:
+            with open("token.log", "r") as logFile:
+                log = logFile.read()
+            print("Error", log)
+        server.kill()
+        await server.wait()  # wait for the child process to exit
+        return exitCode
+    except:
+        with open("error.log", "r") as logFile:
             log = logFile.read()
         print("Error", log)
-    server.kill()
-    await server.wait()  # wait for the child process to exit
-    return exitCode
 
 
 if sys.platform == "win32":

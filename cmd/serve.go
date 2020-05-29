@@ -76,10 +76,12 @@ func runServe(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	err = browser.OpenURL(lpu)
-	if err != nil {
-		jww.ERROR.Println(err)
-		os.Exit(1)
+	if !testing {
+		err = browser.OpenURL(lpu)
+		if err != nil {
+			jww.ERROR.Println(err)
+			os.Exit(1)
+		}
 	}
 	s := ipc.NewServer(oauthHandler)
 
@@ -89,4 +91,5 @@ func runServe(cmd *cobra.Command, args []string) {
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
+
 }

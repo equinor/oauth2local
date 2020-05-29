@@ -13,7 +13,7 @@ import (
 
 var cfgFile string
 var verbose bool
-
+var testing bool
 var rootCmd = &cobra.Command{
 	Use:   "oauth2local",
 	Short: "oauth2local is providing oauth2 authenticated tokens to local processes",
@@ -32,7 +32,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.oauth2local.yaml)")
 	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "log to console to console")
-
+	rootCmd.PersistentFlags().BoolVar(&testing, "testing", false, "run in testing mode")
 }
 
 func initConfig() {
